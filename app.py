@@ -1,8 +1,3 @@
-"""
-app.py — DataLens · Smart Data Analyzer
-Beautiful dark-theme Streamlit app with full EDA, visualizations,
-statistical analysis, regression, outlier detection, and rich PDF reports.
-"""
 
 import streamlit as st
 import polars as pl
@@ -16,9 +11,7 @@ from visualizer      import DataVisualizer, fig_to_html, fig_to_png
 from analyzer        import StatisticalAnalyzer
 from report_exporter import ReportExporter
 
-# ════════════════════════════════════════════════════════════════════════════ #
-#  PAGE CONFIG
-# ════════════════════════════════════════════════════════════════════════════ #
+# page configuration 
 st.set_page_config(
     page_title="DataLens · Smart Analyzer",
     page_icon="🔬",
@@ -61,14 +54,52 @@ section[data-testid="stSidebar"] {
   border-right: 1px solid rgba(108,99,255,0.18) !important;
   box-shadow: 4px 0 32px rgba(0,0,0,0.5);
 }
-section[data-testid="stSidebar"] .stMarkdown h3 {
-  font-family: 'Sora', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: #6C63FF;
-  margin: 20px 0 8px;
+
+/* All sidebar text visible */
+section[data-testid="stSidebar"] * {
+  color: #cbd5e1 !important;
+}
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] .stSelectbox label,
+section[data-testid="stSidebar"] .stSlider label,
+section[data-testid="stSidebar"] .stCheckbox label,
+section[data-testid="stSidebar"] .stFileUploader label,
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] span {
+  color: #cbd5e1 !important;
+  font-size: 13px !important;
+}
+section[data-testid="stSidebar"] .stMarkdown h3,
+section[data-testid="stSidebar"] h3 {
+  font-family: 'Sora', sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.12em !important;
+  color: #818cf8 !important;
+  margin: 20px 0 8px !important;
+}
+/* Selectbox / dropdown text */
+section[data-testid="stSidebar"] [data-baseweb="select"] span,
+section[data-testid="stSidebar"] [data-baseweb="select"] div {
+  color: #e2e8f0 !important;
+}
+/* File uploader helper text */
+section[data-testid="stSidebar"] .stFileUploader div {
+  color: #94a3b8 !important;
+}
+/* Slider value */
+section[data-testid="stSidebar"] .stSlider [data-testid="stThumbValue"] {
+  color: #818cf8 !important;
+  font-weight: 600 !important;
+}
+/* Checkbox */
+section[data-testid="stSidebar"] .stCheckbox span {
+  color: #cbd5e1 !important;
+}
+/* Divider */
+section[data-testid="stSidebar"] hr {
+  border-color: rgba(108,99,255,0.2) !important;
 }
 
 /* ── Logo badge ──────────────────────────────────────── */
@@ -315,7 +346,7 @@ with st.sidebar:
     <div class="logo-wrap">
       <div class="logo-icon">🔬</div>
       <div class="logo-title">DataLens</div>
-      <div class="logo-sub">SMART DATA ANALYZER</div>
+      <div class="logo-sub">SMART DATA ANALYZER By Chirag Maan</div>
     </div>
     """, unsafe_allow_html=True)
     st.divider()
@@ -521,7 +552,7 @@ with tab_overview:
         pf = pd.DataFrame(profiles)
         for c in pf.columns:
             pf[c] = pf[c].astype(str)
-        st.dataframe(pf, width="stretch", height=300)
+        st.dataframe(pf, width='stretch', height=300)
         txt = (f"Dataset has {df.shape[1]} columns: {len(numeric_cols)} numeric and "
                f"{len(cat_cols)} categorical. "
                f"Total missing cells: {metrics['missing_cells']:,}. "
@@ -544,7 +575,7 @@ with tab_overview:
     high_corr = eda.get("high_correlations", [])
     if high_corr:
         _sh("Highly Correlated Pairs")
-        st.dataframe(pd.DataFrame(high_corr), width="stretch")
+        st.dataframe(pd.DataFrame(high_corr), width='stretch')
         txt2 = (f"Found {len(high_corr)} feature pairs with |r| ≥ {corr_threshold}. "
                 "Strongly correlated features may cause multicollinearity in models.")
         st.markdown(f'<div class="interp-box">{txt2}</div>', unsafe_allow_html=True)
@@ -574,7 +605,7 @@ with tab_dist:
         _sh("Summary Statistics")
         ss = eda.get("summary_stats")
         if ss is not None and ss.shape[0] > 0:
-            st.dataframe(ss.to_pandas(), width="stretch")
+            st.dataframe(ss.to_pandas(), width='stretch')
             n_skewed = sum(1 for s in eda.get("skewness",[]) if s["highly_skewed"])
             txt = (f"Summary statistics for {ss.shape[0]} numeric features. "
                    f"{n_skewed} features are highly skewed (|skew| > 1) and may "
@@ -810,7 +841,7 @@ with tab_stats:
                       "p-value":   r.get("p_value","—"),
                       "Normal?":   "✅ Yes" if r.get("is_normal") else "⚠️ No"}
                      for c, r in norm_results.items()]
-        st.dataframe(pd.DataFrame(norm_rows), width="stretch")
+        st.dataframe(pd.DataFrame(norm_rows), width='stretch')
         n_normal = sum(1 for r in norm_results.values() if r.get("is_normal"))
         txt_norm = (f"{n_normal} of {len(norm_results)} numeric columns follow a normal distribution. "
                     "Non-normal features may require non-parametric tests or transformations.")
@@ -829,7 +860,7 @@ with tab_stats:
         ci_rows = [{"Column": c, "n": r.get("n"), "Mean": r.get("mean"),
                     "Lower 95%": r.get("lower"), "Upper 95%": r.get("upper")}
                    for c, r in ci_results.items()]
-        st.dataframe(pd.DataFrame(ci_rows), width="stretch")
+        st.dataframe(pd.DataFrame(ci_rows), width='stretch')
 
         if len(ci_results) >= 2:
             import plotly.graph_objects as _go
@@ -889,7 +920,7 @@ with tab_reg:
                  "Significant": "✅ Yes" if reg["p_values"].get(f,1) < 0.05 else "⚠️ No"}
                 for f, c in reg["coefficients"].items()
             ])
-            st.dataframe(coef_df, width="stretch")
+            st.dataframe(coef_df, width='stretch')
 
             _sh("Regression Diagnostics (4-panel)")
             y_true    = np.asarray(reg["y_true"])
@@ -929,7 +960,7 @@ with tab_reg:
 with tab_data:
     _sh("Cleaned Dataset Preview")
     n_rows = st.slider("Rows to display", 10, min(1000,df.shape[0]), 50)
-    st.dataframe(df.head(n_rows).to_pandas(), width="stretch", height=460)
+    st.dataframe(df.head(n_rows).to_pandas(), width='stretch', height=460)
     st.caption(f"Showing {n_rows:,} of {df.shape[0]:,} rows · "
                f"{df.shape[1]} columns · "
                f"Est. memory: {df.estimated_size('mb'):.2f} MB")
@@ -955,7 +986,7 @@ with tab_download:
         st.caption("Cleaned dataset as flat file")
         st.download_button("⬇️ Download CSV",
                            exporter.to_csv_bytes(df),
-                           "cleaned_data.csv", "text/csv", width="stretch")
+                           "cleaned_data.csv", "text/csv", width='stretch')
     with c2:
         st.markdown("##### 📊 JSON")
         st.caption("Full analysis as structured JSON")
@@ -965,7 +996,7 @@ with tab_download:
         }
         st.download_button("⬇️ Download JSON",
                            exporter.to_json_bytes(report_dict),
-                           "report.json", "application/json", width="stretch")
+                           "report.json", "application/json", width='stretch')
     with c3:
         st.markdown("##### 🌐 HTML")
         st.caption("Interactive charts embedded — open in browser")
@@ -975,7 +1006,7 @@ with tab_download:
             analysis_text=st.session_state.analysis_text,
         )
         st.download_button("⬇️ Download HTML", html_bytes,
-                           "analysis_report.html", "text/html", width="stretch")
+                           "analysis_report.html", "text/html", width='stretch')
     with c4:
         st.markdown("##### 📑 PDF")
         st.caption("All charts + full analysis — print ready")
@@ -987,7 +1018,7 @@ with tab_download:
                     analysis_text=st.session_state.analysis_text,
                 )
                 st.download_button("⬇️ Download PDF", pdf_bytes,
-                                   "report.pdf", "application/pdf", width="stretch")
+                                   "report.pdf", "application/pdf", width='stretch')
             except Exception as e:
                 st.warning(f"PDF error: {e}\n\n`pip install reportlab kaleido`")
 
